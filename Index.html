@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💕para ti mami💕</title>
+    <title>Para ti mi Amor</title>
     <style>
         body {
             margin: 0;
@@ -81,17 +81,44 @@
             0% { opacity: 0.3; }
             100% { opacity: 1; }
         }
+        
+        /* Estilos para el control de audio */
+        .audio-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            background-color: rgba(255, 105, 180, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
     </style>
 </head>
 <body>
     <div class="osito"></div>
     <div class="stars"></div>
+    <audio id="backgroundMusic" loop>
+        <source src="amor.mp3" type="audio/mpeg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+    <button class="audio-control" id="audioToggle">♪</button>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const body = document.body;
             const osito = document.querySelector('.osito');
             const starsContainer = document.querySelector('.stars');
+            const audio = document.getElementById('backgroundMusic');
+            const audioToggle = document.getElementById('audioToggle');
             const colors = [
                 '#FF69B4', '#FF1493', '#DB7093', 
                 '#FFB6C1', '#FFC0CB', '#FF82AB',
@@ -102,6 +129,42 @@
             const maxTeAmo = 200;
             let isShaking = false;
             let lastShakeTime = 0;
+            let isAudioPlaying = false;
+            
+            // Control de audio
+            audioToggle.addEventListener('click', function() {
+                if (isAudioPlaying) {
+                    audio.pause();
+                    audioToggle.textContent = '♪';
+                } else {
+                    audio.play().catch(e => {
+                        console.log("La reproducción automática fue prevenida. Haz clic para reproducir.");
+                    });
+                    audioToggle.textContent = '🔊';
+                }
+                isAudioPlaying = !isAudioPlaying;
+            });
+            
+            // Intenta reproducir automáticamente (puede no funcionar en algunos navegadores)
+            function tryAutoPlay() {
+                const promise = audio.play();
+                if (promise !== undefined) {
+                    promise.catch(error => {
+                        // La reproducción automática falló
+                        console.log("La reproducción automática fue prevenida.");
+                    }).then(() => {
+                        // La reproducción automática funcionó
+                        isAudioPlaying = true;
+                        audioToggle.textContent = '🔊';
+                    });
+                }
+            }
+            
+            // Intenta reproducir después de la primera interacción del usuario
+            document.addEventListener('click', function firstInteraction() {
+                tryAutoPlay();
+                document.removeEventListener('click', firstInteraction);
+            }, { once: true });
             
             // Crear estrellas de fondo
             function createStars() {
